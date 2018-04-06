@@ -1,72 +1,56 @@
 const express = require('express');
-const router = express.Router();
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
 
-const {
-    BlogPosts
-} = require('./models');
+const blogPostRouter = require('./blogPostsRouter');
 
-const jsonParser = bodyParser.json();
 const app = express();
 
 app.use(morgan('common'));
+app.use(express.static('public'));
 
-BlogPosts.create('Title 1', 'lots of interesting content', 'Me');
-BlogPosts.create('Title 2', 'this one is not so good', 'not me');
 
-app.get('/blog-posts', (req, res) => {
-    res.json(BlogPosts.get());
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/views/index.html');
 });
 
-app.post('/blog-posts', jsonParser, (req, res) => {
-    const requiredFields = ['title', 'content', 'author'];
-    for (let i = 0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-            const message = `Missing \`${field}\` in request body`;
-            console.error(message);
-            return res.status(400).send(message);
-        }
-    }
+app.use('/blog-posts', blogPostRouter);
 
-    const item = BlogPosts.create(req.body.title, req.body.content, req.body.author, req.body.publishDate);
-    res.status(201).json(item);
-});
+let server;
 
-app.put('/blog-posts/:id', jsonParser, (req, res) => {
-    const requiredFields = ['title', 'content', 'author'];
-    for (let i = 0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-            const message = `Missing \`${field}\` in request body`;
-            console.error(message);
-            return res.status(400).send(message);
-        }
-    }
-    if (req.params.id !== req.body.id) {
-        const message = `Request path id (${req.params.id}) and request body id (${req.body.id}) must match`;
-        console.error(message);
-        return res.status(400).send(message);
-    }
-
-    console.log(`Updating blog post\`${req.params.id}\``);
-    BlogPosts.update({
-        id: req.params.id,
-        title: req.body.title,
-        content: req.body.content,
-        author: req.body.author,
-        publishDate: req.body.publishDate || Date.now()
+function runServer() {
+    const port = process.env.PORT || 8080;
+    return new Promise((resolve, reject) => {
+        server = app.listen(port, () => {
+            console.log(`Your app is listening on port ${port}`);
+            resolve(server);
+        }).on('error', err => {
+            reject(err)
+        });
     });
-    res.status(204).end();
-});
+}
 
-app.delete('/blog-posts/:id', (req, res) => {
-    BlogPosts.delete(req.params.id);
-    console.log(`Deleted blog post \`${req.params.id}\``);
-    res.status(204).end();
-});
+function closeServer() {
+    return new Promise((resolve, reject) => {
+        console.log('Closing server');
+        server.close(err => {
+            if (err) {
+                reject(err);
+                // so we don't also call `resolve()`
+                return;
+            }
+            resolve();
+        });
+    });
+}
 
-app.listen(process.env.PORT || 8080, () => {
-    console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
-});
+// if server.js is called directly (aka, with `node server.js`), this block
+// runs. but we also export the runServer command so other code (for instance, test code) can start the server as needed.
+if (require.main === module) {
+    runServer().catch(err => console.error(err));
+};
+
+module.exports = {
+    app,
+    runServer,
+    closeServer
+};
