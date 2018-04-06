@@ -1,0 +1,9 @@
+language: node_js
+node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: XxL+j3z7j0xOIz1/kXfbR6AFI126AFj5VRjGfHgukqqmcmo2uw5PX0W8h55r+eOaaRaokhNuJk9gxrNfJYH/WGZwQBJ00JuAjm6ps1XXuYWX1ruyjhSazdm1BubYTs1UbaoU3c9a72pouNlZ40a/hcrki1fIBwIOptD7t/5WlvK0KrNscf8mXeBj2vB6o0QV4ttAxmV88izxWbNKSqTk1EAb43j4FeV+kH3eXgBHOgAc/zJJ0Aw3hO65FezkMadc2X7S3NBzGakRs5gx7kDzqArtt290rjEO4ZPWLIj1fEGATz0X5Ly1yejfHnlmmGeJgIVeM8jP0EJab7IKJJO1UE57yzKtxvzR66qKK3nfnx0Ss2pvVWRx1Pq2bMcbpXJF+wDH2aMl3tfjKylD/XuFe0AVYTvgU1EnWFJPGzKdyi0JLMB2jhh1bxlFlfHRXn/+J4mQYr1lFqrS7W4SCLH4vY7phMdfq6N/0SAUbq4Wriy7I0BGDRtxzffrSdhRB7Id1w8EmZEtY5fV16CL+5W01z72hZIBdnT3/Ihy76MRcAv0nv6U/k+assdrgUMhFAohSaKQ7uMYthE1NMT7s/WgHo31W1uIIgqcP9OuUIo9jsnKB0fnzrL3bI0sVyJHas8gVHlCAuxz59APCsD4tN2+5im1MH1XNWrLJwIK92SCW7o=
+    app: guarded-tundra-54398
+  on:
+    repo: jgmil/blog-api-challenge
